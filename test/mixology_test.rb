@@ -59,5 +59,31 @@ class MixologyTest < Test::Unit::TestCase
     object.mixin mixin
     assert_equal "mixin", object.foo
   end
+  
+  def test_included_modules_after_mixin
+    mixin = Module.new
+    object = Object.new
+    object.mixin mixin
+    assert_equal [mixin, Mixable, Kernel], (class << object; self; end).included_modules
+  end
+  
+  def test_included_modules_after_unmix
+    mixin = Module.new
+    object = Object.new
+    object.mixin mixin
+    object.unmix mixin
+    assert_equal [Mixable, Kernel], (class << object; self; end).included_modules
+  end
+  
+  def test_included_modules_after_remix
+    mixin_one = Module.new
+    mixin_two = Module.new
+    object = Object.new
+    object.mixin mixin_one
+    object.mixin mixin_two
+    assert_equal [mixin_two, mixin_one, Mixable, Kernel], (class << object; self; end).included_modules
+    object.mixin mixin_one
+    assert_equal [mixin_one, mixin_two, Mixable, Kernel], (class << object; self; end).included_modules
+  end
 
 end

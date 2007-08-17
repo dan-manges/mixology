@@ -3,8 +3,6 @@ require 'rake/clean'
 require 'rake/gempackagetask'
 require "rake/testtask"
 
-ARCHLIB = "lib/#{::Config::CONFIG['arch']}"
-
 task :default => %w[clean compile test]
 
 Rake::TestTask.new("test") do |t|
@@ -34,7 +32,7 @@ Gem::manage_gems
 
 specification = Gem::Specification.new do |s|
 	s.name   = "mixology"
-  s.summary = "Mixology enables objects to mix and unmix modules."
+  s.summary = "Mixology enables objects to mixin and unmix modules."
 	s.version = "0.1.0"
 	s.author = "Pat Farley, Z, Dan Manges"
 	s.description = s.summary
