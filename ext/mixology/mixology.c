@@ -26,7 +26,7 @@ static VALUE rb_mixin(VALUE self, VALUE module) {
    module = RBASIC(module)->klass;
   }
   if (!RCLASS(module)->iv_tbl) {
-  	RCLASS(module)->iv_tbl = st_init_numtable();
+  	RCLASS(module)->iv_tbl = (void*)st_init_numtable();
   }
   klass->iv_tbl = RCLASS(module)->iv_tbl;
   klass->m_tbl = RCLASS(module)->m_tbl;
@@ -40,7 +40,7 @@ static VALUE rb_mixin(VALUE self, VALUE module) {
   OBJ_INFECT(klass, module);
   OBJ_INFECT(klass, super);
 
-  RCLASS(rb_singleton_class(self))->super = klass;
+  RCLASS(rb_singleton_class(self))->super = (int)klass;
   rb_clear_cache();
 	return self;
 }
