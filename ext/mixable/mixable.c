@@ -47,5 +47,7 @@ static void rb_mixin(VALUE self, VALUE module) {
 	  VALUE Mixable = rb_define_module("Mixable");
 	  rb_define_method(Mixable, "mixin", rb_mixin, 1);
 	  rb_define_method(Mixable, "unmix", rb_unmix, 1);
+	  rb_include_module(rb_cObject, Mixable);
+
 	}
 	
