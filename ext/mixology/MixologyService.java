@@ -19,11 +19,11 @@ public class MixologyService implements BasicLibraryService {
         return true;
     }
     
-    public IRubyObject mixin(IRubyObject recv, RubyModule arg, Block block) {
+    public static IRubyObject mixin(IRubyObject recv, RubyModule arg, Block block) {
         return arg.extend_object(recv);
     }
 
-    public IRubyObject unmix(IRubyObject recv, RubyModule args, Block block) {
+    public static IRubyObject unmix(IRubyObject recv, RubyModule args, Block block) {
         return recv.getRuntime().getNil();
     }
 
@@ -33,6 +33,6 @@ public class MixologyService implements BasicLibraryService {
         CallbackFactory callbackFactory = runtime.callbackFactory(MixologyService.class);
         mixologyModule.definePublicModuleFunction("mixin", callbackFactory.getSingletonMethod("mixin", RubyModule.class));
         mixologyModule.definePublicModuleFunction("unmix", callbackFactory.getSingletonMethod("unmix", RubyModule.class));
-				runtime.getObject().includeModule(mixologyModule);
+	    runtime.getObject().includeModule(mixologyModule);
     }
 }

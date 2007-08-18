@@ -29,7 +29,7 @@ file "ext/mixology/mixology.#{Config::CONFIG['DLEXT']}" do
   cp "ext/mixology/mixology.#{Config::CONFIG['DLEXT']}", "lib"
 end
 
-CLEAN.include ["ext/mixology/Makefile", "ext/mixology/mixology.bundle"]
+CLEAN.include ["ext/mixology/Makefile", "ext/mixology/mixology.bundle", "lib/mixology.bundle"]
 CLEAN.include ["ext/mixology/MixableService.class", "ext/mixology/mixable.jar", "lib/mixology.jar"]
 
 Gem::manage_gems
