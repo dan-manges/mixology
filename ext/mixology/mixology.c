@@ -45,9 +45,9 @@ static VALUE rb_mixin(VALUE self, VALUE module) {
 	return self;
 }
 
-	void Init_mixable() {
-	  VALUE Mixable = rb_define_module("Mixable");
-	  rb_define_method(Mixable, "mixin", rb_mixin, 1);
-	  rb_define_method(Mixable, "unmix", rb_unmix, 1);
-	  rb_include_module(rb_cObject, Mixable);
+	void Init_mixology() {
+	  VALUE Mixology = rb_define_module("Mixology");
+	  rb_define_method(Mixology, "mixin", rb_mixin, 1);
+	  rb_define_method(Mixology, "unmix", rb_unmix, 1);
+	  rb_include_module(rb_cObject, Mixology);
 	}

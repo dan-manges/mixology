@@ -12,9 +12,9 @@ import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.load.BasicLibraryService;
 
-public class MixableService implements BasicLibraryService {
+public class MixologyService implements BasicLibraryService {
     public boolean basicLoad(final Ruby runtime) throws IOException {
-        Init_mixable(runtime);
+        Init_mixology(runtime);
         return true;
     }
     
@@ -27,10 +27,10 @@ public class MixableService implements BasicLibraryService {
     }
 
 
-    public static void Init_mixable(Ruby runtime) {
-        RubyModule mixableModule = runtime.defineModule("Mixable");
-        CallbackFactory callbackFactory = runtime.callbackFactory(MixableService.class);
-        mixableModule.definePublicModuleFunction("mixin", callbackFactory.getSingletonMethod("mixin", RubyModule.class));
-        mixableModule.definePublicModuleFunction("unmix", callbackFactory.getSingletonMethod("unmix", RubyModule.class));
+    public static void Init_mixology(Ruby runtime) {
+        RubyModule mixologyModule = runtime.defineModule("Mixology");
+        CallbackFactory callbackFactory = runtime.callbackFactory(MixologyService.class);
+        mixologyModule.definePublicModuleFunction("mixin", callbackFactory.getSingletonMethod("mixin", RubyModule.class));
+        mixologyModule.definePublicModuleFunction("unmix", callbackFactory.getSingletonMethod("unmix", RubyModule.class));
     }
 }

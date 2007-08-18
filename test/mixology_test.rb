@@ -64,7 +64,7 @@ class MixologyTest < Test::Unit::TestCase
     mixin = Module.new
     object = Object.new
     object.mixin mixin
-    assert_equal [mixin, Mixable, Kernel], (class << object; self; end).included_modules
+    assert_equal [mixin, Mixology, Kernel], (class << object; self; end).included_modules
   end
   
   def test_included_modules_after_unmix
@@ -72,7 +72,7 @@ class MixologyTest < Test::Unit::TestCase
     object = Object.new
     object.mixin mixin
     object.unmix mixin
-    assert_equal [Mixable, Kernel], (class << object; self; end).included_modules
+    assert_equal [Mixology, Kernel], (class << object; self; end).included_modules
   end
   
   def test_included_modules_after_remix
@@ -81,9 +81,9 @@ class MixologyTest < Test::Unit::TestCase
     object = Object.new
     object.mixin mixin_one
     object.mixin mixin_two
-    assert_equal [mixin_two, mixin_one, Mixable, Kernel], (class << object; self; end).included_modules
+    assert_equal [mixin_two, mixin_one, Mixology, Kernel], (class << object; self; end).included_modules
     object.mixin mixin_one
-    assert_equal [mixin_one, mixin_two, Mixable, Kernel], (class << object; self; end).included_modules
+    assert_equal [mixin_one, mixin_two, Mixology, Kernel], (class << object; self; end).included_modules
   end
   
   def test_mixin_returns_object
@@ -92,7 +92,6 @@ class MixologyTest < Test::Unit::TestCase
     assert_equal object, object.mixin(mixin)
   end
   
-  # Does it make more sense for unmix to return the object or the module?
   def test_unmix_returns_module
     object = Object.new
     mixin = Module.new

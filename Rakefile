@@ -14,24 +14,22 @@ Rake::TestTask.new("test") do |t|
 end
 
 desc "Builds the extension"
-task :compile => ["ext/mixable/Makefile", "ext/mixable/mixable.#{Config::CONFIG['DLEXT']}" ]
+task :compile => ["ext/mixology/Makefile", "ext/mixology/mixology.#{Config::CONFIG['DLEXT']}" ]
 
-file "ext/mixable/Makefile" => ["ext/mixable/extconf.rb"] do
-  Dir.chdir("ext/mixable") do
+file "ext/mixology/Makefile" => ["ext/mixology/extconf.rb"] do
+  Dir.chdir("ext/mixology") do
     ruby "extconf.rb"
   end  
 end
 
-file "ext/mixable/mixable.#{Config::CONFIG['DLEXT']}" do
-  Dir.chdir("ext/mixable") do
+file "ext/mixology/mixology.#{Config::CONFIG['DLEXT']}" do
+  Dir.chdir("ext/mixology") do
     sh "make"
   end
-  mkdir_p "lib"
-  cp "ext/mixable/mixable.#{Config::CONFIG['DLEXT']}", "lib"
 end
 
-CLEAN.include ["ext/mixable/Makefile", "ext/mixable/mixable.bundle", "lib/mixable.bundle"]
-CLEAN.include ["ext/mixable/MixableService.class", "ext/mixable/mixable.jar", "lib/mixable.jar"]
+CLEAN.include ["ext/mixology/Makefile", "ext/mixology/mixology.bundle"]
+CLEAN.include ["ext/mixology/MixableService.class", "ext/mixology/mixable.jar", "lib/mixology.jar"]
 
 Gem::manage_gems
 
@@ -48,7 +46,7 @@ specification = Gem::Specification.new do |s|
   s.files = FileList['ext/**/*.{c,rb}', '{lib,test}/**/*.rb', '^[A-Z]+$', 'Rakefile'].to_a
   if RUBY_PLATFORM =~ /mswin/
     s.platform = Gem::Platform::WIN32
-    s.files += ["lib/mixable.so"]
+    s.files += ["lib/mixology.so"]
   else
     s.platform = Gem::Platform::RUBY
     s.extensions = FileList["ext/**/extconf.rb"].to_a
@@ -61,10 +59,10 @@ end
 
 desc "Compiles the JRuby extension"
 task :compile_java do
-  Dir.chdir("ext/mixable") do
-    sh %{javac -source 1.4 -target 1.4 -classpath $JRUBY_HOME/lib/jruby.jar MixableService.java}
-    sh %{jar cf mixable.jar MixableService.class}
-    cp "mixable.jar", "../../lib/mixable.jar"
+  Dir.chdir("ext/mixology") do
+    sh %{javac -source 1.4 -target 1.4 -classpath $JRUBY_HOME/lib/jruby.jar MixologyService.java}
+    sh %{jar cf mixology.jar MixologyService.class}
+    cp "mixology.jar", "../../lib/mixology.jar"
   end
 end
 

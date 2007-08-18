@@ -1,2 +1,2 @@
 require "test/unit"
-require "mixable"
+require "ext/mixology/mixology"
