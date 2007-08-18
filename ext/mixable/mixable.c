@@ -1,6 +1,6 @@
 #include "ruby.h"
 
-static void rb_unmix(VALUE self, VALUE module) {
+static VALUE rb_unmix(VALUE self, VALUE module) {
   VALUE klass;
   for (klass = RBASIC(self)->klass; klass != rb_class_real(klass); klass = RCLASS(klass)->super) {
    VALUE super = RCLASS(klass)->super;
@@ -11,9 +11,10 @@ static void rb_unmix(VALUE self, VALUE module) {
      }
    }
   }
+	return self;
 }
 
-static void rb_mixin(VALUE self, VALUE module) {
+static VALUE rb_mixin(VALUE self, VALUE module) {
   
 	rb_unmix(self, module);
 
@@ -41,6 +42,7 @@ static void rb_mixin(VALUE self, VALUE module) {
 
   RCLASS(rb_singleton_class(self))->super = klass;
   rb_clear_cache();
+	return self;
   }
 
 	void Init_mixable() {
