@@ -19,6 +19,7 @@ task :compile => ["ext/mixology/Makefile", "ext/mixology/mixology.#{Config::CONF
 file "ext/mixology/Makefile" => ["ext/mixology/extconf.rb"] do
   Dir.chdir("ext/mixology") do
     ruby "extconf.rb"
+    cp "mixology.o", "../../lib/"
   end  
 end
 

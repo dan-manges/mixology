@@ -2,6 +2,7 @@ import java.io.IOException;
 
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
+import org.jruby.RubyObject;
 import org.jruby.RubyHash;
 import org.jruby.RubyModule;
 import org.jruby.RubyNumeric;
@@ -14,23 +15,24 @@ import org.jruby.runtime.load.BasicLibraryService;
 
 public class MixologyService implements BasicLibraryService {
     public boolean basicLoad(final Ruby runtime) throws IOException {
-        Init_mixology(runtime);
+        Init_mixology_service(runtime);
         return true;
     }
     
-    public static IRubyObject mixin(IRubyObject recv, RubyModule arg, Block block) {
+    public IRubyObject mixin(IRubyObject recv, RubyModule arg, Block block) {
         return arg.extend_object(recv);
     }
 
-    public static IRubyObject unmix(IRubyObject recv, RubyModule args, Block block) {
+    public IRubyObject unmix(IRubyObject recv, RubyModule args, Block block) {
         return recv.getRuntime().getNil();
     }
 
 
-    public static void Init_mixology(Ruby runtime) {
+    public void Init_mixology_service(Ruby runtime) {
         RubyModule mixologyModule = runtime.defineModule("Mixology");
         CallbackFactory callbackFactory = runtime.callbackFactory(MixologyService.class);
         mixologyModule.definePublicModuleFunction("mixin", callbackFactory.getSingletonMethod("mixin", RubyModule.class));
         mixologyModule.definePublicModuleFunction("unmix", callbackFactory.getSingletonMethod("unmix", RubyModule.class));
+				runtime.getObject().includeModule(mixologyModule);
     }
 }
