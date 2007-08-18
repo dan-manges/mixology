@@ -3,7 +3,11 @@ require 'rake/clean'
 require 'rake/gempackagetask'
 require "rake/testtask"
 
-task :default => %w[clean compile test]
+if RUBY_PLATFORM =~ /java/
+  task :default => %w[clean compile_java test]
+else
+  task :default => %w[clean compile test]
+end
 
 Rake::TestTask.new("test") do |t|
   t.pattern = "test/**/*_test.rb"
@@ -27,6 +31,7 @@ file "ext/mixable/mixable.#{Config::CONFIG['DLEXT']}" do
 end
 
 CLEAN.include ["ext/mixable/Makefile", "ext/mixable/mixable.bundle", "lib/mixable.bundle"]
+CLEAN.include ["ext/mixable/MixableService.class", "ext/mixable/mixable.jar", "lib/mixable.jar"]
 
 Gem::manage_gems
 
@@ -53,3 +58,13 @@ Rake::GemPackageTask.new(specification) do |package|
   package.need_zip = false
   package.need_tar = false
 end
+
+desc "Compiles the JRuby extension"
+task :compile_java do
+  Dir.chdir("ext/mixable") do
+    sh %{javac -source 1.4 -target 1.4 -classpath $JRUBY_HOME/lib/jruby.jar MixableService.java}
+    sh %{jar cf mixable.jar MixableService.class}
+    cp "mixable.jar", "../../lib/mixable.jar"
+  end
+end
+
