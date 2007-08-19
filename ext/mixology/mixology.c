@@ -11,7 +11,7 @@ static VALUE rb_unmix(VALUE self, VALUE module) {
      }
    }
   }
-  return module;
+  return self;
 }
 
 static VALUE rb_mixin(VALUE self, VALUE module) {

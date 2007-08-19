@@ -92,11 +92,11 @@ class MixologyTest < Test::Unit::TestCase
     assert_equal object, object.mixin(mixin)
   end
   
-  def test_unmix_returns_module
+  def test_unmix_returns_object
     object = Object.new
     mixin = Module.new
     object.mixin mixin
-    assert_equal mixin, object.unmix(mixin)
+    assert_equal object, object.unmix(mixin)
   end
 
 end
