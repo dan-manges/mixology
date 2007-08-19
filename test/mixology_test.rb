@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + "/test_helper"
 
 class MixologyTest < Test::Unit::TestCase
 
+
   def test_mixin
     mixin = Module.new { def foo; "foo"; end }
     object = Object.new

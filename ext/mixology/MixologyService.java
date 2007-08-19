@@ -13,6 +13,7 @@ import org.jruby.RubyHash;
 import org.jruby.RubyModule;
 import org.jruby.RubyNumeric;
 import org.jruby.RubyString;
+import org.jruby.IncludedModuleWrapper;
 import org.jruby.runtime.Block;
 import org.jruby.runtime.CallbackFactory;
 import org.jruby.runtime.builtin.IRubyObject;
@@ -30,36 +31,49 @@ public class MixologyService implements BasicLibraryService {
     }
     
     
-		public static IRubyObject mixin(IRubyObject recv, RubyModule arg, Block block) {
-        return arg.extend_object(recv);
+		public synchronized static IRubyObject mixin(IRubyObject recv, RubyModule module, Block block) 
+			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+      	unmix(recv, module, block);  
+
+        assert module != null;
+				RubyModule klass = recv.getSingletonClass();
+
+        klass.infectBy(module);
+				
+				IncludedModuleWrapper includedKlass = new IncludedModuleWrapper(klass.getRuntime(), klass.getSuperClass(), module);
+				
+        setSuperClass(klass, includedKlass);
+
+				clearCache(klass, klass.getSuperClass());	
+				return recv;
     }
 
-    public static IRubyObject unmix(IRubyObject recv, RubyModule arg, Block block) 
+    public synchronized static IRubyObject unmix(IRubyObject recv, RubyModule module, Block block) 
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         for (RubyModule klass = recv.getMetaClass(); klass != recv.getMetaClass().getRealClass(); klass = klass.getSuperClass()) {
-            if (klass.getSuperClass() != null &&  klass.getSuperClass().getNonIncludedClass() == arg) {
+            if (klass.getSuperClass() != null &&  klass.getSuperClass().getNonIncludedClass() == module) {
 									setSuperClass(klass, klass.getSuperClass().getSuperClass());
-									clearCache(recv.getRuntime(), klass, arg);	
+									clearCache(klass, module);	
 						}
         }
 
-        return recv.getRuntime().getNil();
+        return recv;
     }
 
-		protected static void setSuperClass(RubyModule klass, RubyModule superClass)
+		protected synchronized static void setSuperClass(RubyModule klass, RubyModule superClass)
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-				Method setSuperClass = RubyModule.class.getDeclaredMethod("setSuperClass", new Class[] {RubyClass.class} );
-				setSuperClass.setAccessible(true);
-				Object[] newSuperClass = new Object[] { superClass };
-				setSuperClass.invoke(klass, newSuperClass);
+				Method method = RubyModule.class.getDeclaredMethod("setSuperClass", new Class[] {RubyClass.class} );
+				method.setAccessible(true);
+				Object[] superClassArg = new Object[] { superClass };
+				method.invoke(klass, superClassArg);
 		}
 
-		protected static void clearCache(final Ruby runtime, RubyModule klass, RubyModule module) {
+		protected static void clearCache(RubyModule klass, RubyModule module) {
 			List methodNames = new ArrayList(module.getMethods().keySet());
       for (Iterator iter = methodNames.iterator();
       	iter.hasNext();) {
         String methodName = (String) iter.next();
-        runtime.getCacheMap().remove(methodName, klass.searchMethod(methodName));
+        klass.getRuntime().getCacheMap().remove(methodName, klass.searchMethod(methodName));
       }
 		}
 }
