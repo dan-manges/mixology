@@ -8,11 +8,7 @@ import java.util.ArrayList;
 
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
-import org.jruby.RubyObject;
-import org.jruby.RubyHash;
 import org.jruby.RubyModule;
-import org.jruby.RubyNumeric;
-import org.jruby.RubyString;
 import org.jruby.IncludedModuleWrapper;
 import org.jruby.runtime.Block;
 import org.jruby.runtime.CallbackFactory;
