@@ -1,19 +1,5 @@
 #include "ruby.h"
 
-static VALUE rb_unmix(VALUE self, VALUE module) {
-  VALUE klass;
-  for (klass = RBASIC(self)->klass; klass != rb_class_real(klass); klass = RCLASS(klass)->super) {
-   VALUE super = RCLASS(klass)->super;
-   if (BUILTIN_TYPE(super) == T_ICLASS) {
-  		if (RBASIC(super)->klass == module) {
-       RCLASS(klass)->super = RCLASS(super)->super;
-       rb_clear_cache();
-     }
-   }
-  }
-  return self;
-}
-
 /* copied and pasted from class.c rb_include_module */
 static VALUE rb_already_included(VALUE klass, VALUE module) {
 	int superclass_seen = Qfalse;
@@ -40,7 +26,32 @@ static VALUE rb_already_included(VALUE klass, VALUE module) {
   return superclass_seen;
 }
 
+static VALUE rb_unmix(VALUE self, VALUE module) {
+  VALUE nested_modules = rb_mod_included_modules(module);
+  int index;
+  for (index = 0; index < RARRAY(nested_modules)->len; index++) {
+    VALUE nested_module = RARRAY(nested_modules)->ptr[index];
+    if (rb_already_included(self, nested_module)) {
+      rb_unmix(self, nested_module);
+    }
+  }
+
+  VALUE klass;
+  for (klass = RBASIC(self)->klass; klass != rb_class_real(klass); klass = RCLASS(klass)->super) {
+   VALUE super = RCLASS(klass)->super;
+   if (BUILTIN_TYPE(super) == T_ICLASS) {
+  		if (RBASIC(super)->klass == module) {
+       RCLASS(klass)->super = RCLASS(super)->super;
+       rb_clear_cache();
+     }
+   }
+  }
+  return self;
+}
+
 static VALUE rb_mixin(VALUE self, VALUE module) {
+	rb_unmix(self, module);
+
   VALUE nested_modules = rb_mod_included_modules(module);
   int index;
   for (index = 0; index < RARRAY(nested_modules)->len; index++) {
@@ -49,8 +60,6 @@ static VALUE rb_mixin(VALUE self, VALUE module) {
       rb_mixin(self, nested_module);
     }
   }
-
-	rb_unmix(self, module);
 
 	VALUE super = RCLASS(rb_singleton_class(self))->super;
   NEWOBJ(klass, struct RClass);

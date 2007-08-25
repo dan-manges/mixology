@@ -108,9 +108,9 @@ class MixologyTest < Test::Unit::TestCase
     assert_equal [mixin, nested_module], (class << object; self; end).included_modules[0,2]
   end
 
-  # Pat: I(Dan) changed this, but I can change it back... can't we run into some
+  # Pat: I(Dan) changed this, but I can change it back... won't we run into some
   #      cyclic issues if we include a module already included?
-  def test_nested_modules_are_not_mixedin_even_if_alrady_mixed_in
+  def test_nested_modules_are_not_mixedin_if_alrady_mixed_in
     nested_module = Module.new { def foo; "foo"; end }
     mixin = Module.new { include nested_module }
     object = Object.new
@@ -125,7 +125,7 @@ class MixologyTest < Test::Unit::TestCase
     object = Object.new
     object.mixin mixin
     object.unmix mixin
-    assert_equal [Mixology, Kernel], (class << object; self; end).included_modules
+    assert_equal [Mixology, Kernel], (class << object; self; end).included_modules[-2..-1]
   end
 
   def test_module_is_not_unmixed_if_it_is_outside_nested_chain
