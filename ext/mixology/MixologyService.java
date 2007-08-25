@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.jruby.Ruby;
+import org.jruby.RubyArray;
 import org.jruby.RubyClass;
 import org.jruby.RubyModule;
 import org.jruby.IncludedModuleWrapper;
@@ -29,7 +30,12 @@ public class MixologyService implements BasicLibraryService {
     
 		public synchronized static IRubyObject mixin(IRubyObject recv, RubyModule module, Block block) 
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-      	unmix(recv, module, block);  
+      	unmix(recv, module, block);
+      	RubyArray nested_modules = module.included_modules();
+      	for (int i=0; i<nested_modules.size(); i++) {
+      	    mixin(recv, (RubyModule)nested_modules.entry(i), block);
+      	}
+      	
 
         assert module != null;
 				RubyModule klass = recv.getSingletonClass();
