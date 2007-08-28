@@ -26,42 +26,38 @@ static VALUE rb_already_included(VALUE klass, VALUE module) {
   return superclass_seen;
 }
 
-static VALUE rb_unmix(VALUE self, VALUE module) {
-  VALUE nested_modules = rb_mod_included_modules(module);
-  int index;
-  for (index = 0; index < RARRAY(nested_modules)->len; index++) {
-    VALUE nested_module = RARRAY(nested_modules)->ptr[index];
-    if (rb_already_included(self, nested_module)) {
-      rb_unmix(self, nested_module);
-    }
-  }
+static void remove_nested_module(VALUE klass, VALUE include_class) {
 
-  VALUE klass;
+	 if(RBASIC(RCLASS(klass)->super)->klass != RBASIC(RCLASS(include_class)->super)->klass) {
+	  	return;
+	 }
+	
+	if(RCLASS(RCLASS(include_class)->super)->super && BUILTIN_TYPE(RCLASS(include_class)->super) == T_ICLASS) {
+		remove_nested_module(RCLASS(klass)->super, RCLASS(include_class)->super);
+  }
+       RCLASS(klass)->super = RCLASS(RCLASS(klass)->super)->super;
+}
+
+static VALUE rb_unmix(VALUE self, VALUE module) {
+
+
+	VALUE klass;
   for (klass = RBASIC(self)->klass; klass != rb_class_real(klass); klass = RCLASS(klass)->super) {
    VALUE super = RCLASS(klass)->super;
    if (BUILTIN_TYPE(super) == T_ICLASS) {
   		if (RBASIC(super)->klass == module) {
-       RCLASS(klass)->super = RCLASS(super)->super;
-       rb_clear_cache();
+			  if(RCLASS(module)->super && BUILTIN_TYPE(RCLASS(module)->super) == T_ICLASS) 
+					remove_nested_module(super, module);
+       	RCLASS(klass)->super = RCLASS(RCLASS(klass)->super)->super;
+       	rb_clear_cache();
      }
    }
   }
   return self;
 }
 
-static VALUE rb_mixin(VALUE self, VALUE module) {
-	rb_unmix(self, module);
-
-  VALUE nested_modules = rb_mod_included_modules(module);
-  int index;
-  for (index = 0; index < RARRAY(nested_modules)->len; index++) {
-    VALUE nested_module = RARRAY(nested_modules)->ptr[index];
-    if (!rb_already_included(self, nested_module)) {
-      rb_mixin(self, nested_module);
-    }
-  }
-
-	VALUE super = RCLASS(rb_singleton_class(self))->super;
+static void add_module(VALUE self, VALUE module) {
+		VALUE super = RCLASS(rb_singleton_class(self))->super;
   NEWOBJ(klass, struct RClass);
   OBJSETUP(klass, rb_cClass, T_ICLASS);
 
@@ -84,6 +80,21 @@ static VALUE rb_mixin(VALUE self, VALUE module) {
   OBJ_INFECT(klass, super);
 
   RCLASS(rb_singleton_class(self))->super = (int)klass;
+
+}
+
+static VALUE rb_mixin(VALUE self, VALUE module) {
+	rb_unmix(self, module);
+
+  VALUE nested_modules = rb_mod_included_modules(module);
+  int index;
+  for (index = RARRAY(nested_modules)->len; index > 0; index--) {
+    VALUE nested_module = RARRAY(nested_modules)->ptr[index-1];
+      add_module(self, nested_module);
+  }
+
+	add_module(self, module);
+
   rb_clear_cache();
 	return self;
 }
