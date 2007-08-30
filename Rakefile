@@ -29,8 +29,8 @@ file "ext/mixology/mixology.#{Config::CONFIG['DLEXT']}" do
   cp "ext/mixology/mixology.#{Config::CONFIG['DLEXT']}", "lib"
 end
 
-CLEAN.include ["ext/mixology/Makefile", "ext/mixology/mixology.bundle", "lib/mixology.bundle"]
-CLEAN.include ["ext/mixology/MixableService.class", "ext/mixology/mixable.jar", "lib/mixology.jar"]
+CLEAN.include %w[ext/mixology/Makefile ext/mixology/mixology.bundle lib/mixology.bundle]
+CLEAN.include %w[ext/mixology/MixableService.class ext/mixology/mixable.jar lib/mixology.jar]
 
 Gem::manage_gems
 
@@ -38,7 +38,7 @@ specification = Gem::Specification.new do |s|
 	s.name   = "mixology"
   s.summary = "Mixology enables objects to mixin and unmix modules."
 	s.version = "0.1.0"
-	s.author = "Pat Farley, anonymous z, Dan Manges"
+	s.author = "anonymous z, Pat Farley, Dan Manges"
 	s.description = s.summary
   s.homepage = "http://mixology.rubyforge.org"
   s.rubyforge_project = "mixology"
@@ -66,4 +66,3 @@ task :compile_java do
     cp "mixology.jar", "../../lib/mixology.jar"
   end
 end
-
