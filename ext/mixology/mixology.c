@@ -1,37 +1,10 @@
 #include "ruby.h"
 
-/* copied and pasted from class.c rb_include_module */
-static VALUE rb_already_included(VALUE klass, VALUE module) {
-	int superclass_seen = Qfalse;
-  VALUE p, c;
-  c = klass;
-	if (RCLASS(klass)->m_tbl == RCLASS(module)->m_tbl)
-	    rb_raise(rb_eArgError, "cyclic include detected");
-	for (p = RCLASS(klass)->super; p; p = RCLASS(p)->super) {
-	    switch (BUILTIN_TYPE(p)) {
-	      case T_ICLASS:
-		      if (RCLASS(p)->m_tbl == RCLASS(module)->m_tbl) {
-		        if (!superclass_seen) {
-			        c = p;	/* move insertion point */
-		        }
-		        goto skip;
-		      }
-		    break;
-	      case T_CLASS:
-		      superclass_seen = Qtrue;
-		      break;
-	    }
-	}
-	skip:
-  return superclass_seen;
-}
-
 static void remove_nested_module(VALUE klass, VALUE include_class) {
 
 	 if(RBASIC(RCLASS(klass)->super)->klass != RBASIC(RCLASS(include_class)->super)->klass) {
 	  	return;
 	 }
-	
 	if(RCLASS(RCLASS(include_class)->super)->super && BUILTIN_TYPE(RCLASS(include_class)->super) == T_ICLASS) {
 		remove_nested_module(RCLASS(klass)->super, RCLASS(include_class)->super);
   }
@@ -39,8 +12,6 @@ static void remove_nested_module(VALUE klass, VALUE include_class) {
 }
 
 static VALUE rb_unmix(VALUE self, VALUE module) {
-
-
 	VALUE klass;
   for (klass = RBASIC(self)->klass; klass != rb_class_real(klass); klass = RCLASS(klass)->super) {
    VALUE super = RCLASS(klass)->super;
