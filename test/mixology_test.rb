@@ -106,6 +106,16 @@ class MixologyTest < Test::Unit::TestCase
     object.mixin mixin
     assert_equal [mixin, nested_module, Mixology, Kernel], (class << object; self; end).included_modules
   end
+
+  test "nested modules are mixedin deeply" do
+    nested_module_ultimate = Module.new
+    nested_module_penultimate = Module.new { include nested_module_ultimate }
+    nested_module = Module.new { include nested_module_penultimate }
+    mixin = Module.new { include nested_module }
+    object = Object.new
+    object.mixin mixin
+    assert_equal [mixin, nested_module, nested_module_penultimate, nested_module_ultimate, Mixology, Kernel], (class << object; self; end).included_modules
+  end
    
   test "nested modules are mixedin even if alrady mixed in" do
     nested_module = Module.new { def foo; "foo"; end }

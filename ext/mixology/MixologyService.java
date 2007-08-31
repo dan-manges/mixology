@@ -53,13 +53,16 @@ public class MixologyService implements BasicLibraryService {
 			for (RubyModule p = module.getSuperClass(); p != null; p = p.getSuperClass()) 
 				nestedModuleCount++;
 
-			IncludedModuleWrapper[] nestedModule = new IncludedModuleWrapper[nestedModuleCount];
-   		for(int index = 0; index < nestedModule.length; index++){
-				nestedModule[index] = (IncludedModuleWrapper)module.getSuperClass();
+			IncludedModuleWrapper[] nestedModules = new IncludedModuleWrapper[nestedModuleCount];
+
+   		IncludedModuleWrapper nestedModule = (IncludedModuleWrapper)module.getSuperClass();
+			for(int index = 0; index < nestedModules.length; index++){
+				nestedModules[index] = nestedModule;
+				nestedModule =  (IncludedModuleWrapper)nestedModule.getSuperClass();
 			}
 
-		  for(int index = nestedModule.length; index > 0; index--) {
-		      add_module(klass, nestedModule[index-1].getNonIncludedClass());
+		  for(int index = nestedModules.length; index > 0; index--) {
+		      add_module(klass, nestedModules[index-1].getNonIncludedClass());
 		  }
 
 				add_module(klass, module);
@@ -83,17 +86,18 @@ public class MixologyService implements BasicLibraryService {
 		protected synchronized static void remove_nested_module(RubyClass klass, RubyModule include_class) 
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 	
-				if(! (klass.getSuperClass() instanceof IncludedModuleWrapper) || !(include_class.getSuperClass() instanceof IncludedModuleWrapper) 
-				|| ((IncludedModuleWrapper)klass.getSuperClass()).getNonIncludedClass() != ((IncludedModuleWrapper)include_class.getSuperClass()).getNonIncludedClass()) 
+				if(! (klass.getSuperClass() instanceof IncludedModuleWrapper) ||
+				 ((IncludedModuleWrapper)klass.getSuperClass()).getNonIncludedClass() != ((IncludedModuleWrapper)include_class.getSuperClass()).getNonIncludedClass()) 
 					return;
+					
 	
-				if(include_class.getSuperClass().getSuperClass() != null && include_class.getSuperClass().getSuperClass() instanceof IncludedModuleWrapper) {
-						remove_nested_module(klass.getSuperClass().getSuperClass(), include_class.getSuperClass());
+				if(include_class.getSuperClass().getSuperClass() != null && include_class.getSuperClass() instanceof IncludedModuleWrapper) {
+						remove_nested_module(klass.getSuperClass(), include_class.getSuperClass());
   			}
       
  				setSuperClass(klass, klass.getSuperClass().getSuperClass());
 
-		}		    
+		}
 
 		protected synchronized static void setSuperClass(RubyModule klass, RubyModule superClass)
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
