@@ -27,18 +27,49 @@ public class MixologyService implements BasicLibraryService {
         return true;
     }
     
-    
+
+    public synchronized static IRubyObject unmix(IRubyObject recv, RubyModule module, Block block) 
+			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        for (RubyModule klass = recv.getMetaClass(); klass != recv.getMetaClass().getRealClass(); klass = klass.getSuperClass()) {
+            if (klass.getSuperClass() != null &&  klass.getSuperClass().getNonIncludedClass() == module) {
+						  if(module.getSuperClass() != null && module.getSuperClass() instanceof IncludedModuleWrapper) 
+								remove_nested_module(klass.getSuperClass(), module);
+									setSuperClass(klass, klass.getSuperClass().getSuperClass());
+									clearCache(klass, module);	
+						}
+        }
+
+        return recv;
+
+    }
+
 		public synchronized static IRubyObject mixin(IRubyObject recv, RubyModule module, Block block) 
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
       	unmix(recv, module, block);
-      	RubyArray nested_modules = module.included_modules();
-      	for (int i=0; i<nested_modules.size(); i++) {
-      	    mixin(recv, (RubyModule)nested_modules.entry(i), block);
-      	}
-      	
 
-        assert module != null;
-				RubyModule klass = recv.getSingletonClass();
+			RubyClass klass = recv.getSingletonClass();
+
+      int nestedModuleCount = 0;
+			for (RubyModule p = module.getSuperClass(); p != null; p = p.getSuperClass()) 
+				nestedModuleCount++;
+
+			IncludedModuleWrapper[] nestedModule = new IncludedModuleWrapper[nestedModuleCount];
+   		for(int index = 0; index < nestedModule.length; index++){
+				nestedModule[index] = (IncludedModuleWrapper)module.getSuperClass();
+			}
+
+		  for(int index = nestedModule.length; index > 0; index--) {
+		      add_module(klass, nestedModule[index-1].getNonIncludedClass());
+		  }
+
+				add_module(klass, module);
+				clearCache(klass, klass.getSuperClass());	
+
+				return recv;
+		}
+
+		protected synchronized static void add_module(RubyClass klass, RubyModule module) 
+			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 
         klass.infectBy(module);
 				
@@ -47,20 +78,22 @@ public class MixologyService implements BasicLibraryService {
         setSuperClass(klass, includedKlass);
 
 				clearCache(klass, klass.getSuperClass());	
-				return recv;
     }
 
-    public synchronized static IRubyObject unmix(IRubyObject recv, RubyModule module, Block block) 
+		protected synchronized static void remove_nested_module(RubyClass klass, RubyModule include_class) 
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        for (RubyModule klass = recv.getMetaClass(); klass != recv.getMetaClass().getRealClass(); klass = klass.getSuperClass()) {
-            if (klass.getSuperClass() != null &&  klass.getSuperClass().getNonIncludedClass() == module) {
-									setSuperClass(klass, klass.getSuperClass().getSuperClass());
-									clearCache(klass, module);	
-						}
-        }
+	
+				if(! (klass.getSuperClass() instanceof IncludedModuleWrapper) || !(include_class.getSuperClass() instanceof IncludedModuleWrapper) 
+				|| ((IncludedModuleWrapper)klass.getSuperClass()).getNonIncludedClass() != ((IncludedModuleWrapper)include_class.getSuperClass()).getNonIncludedClass()) 
+					return;
+	
+				if(include_class.getSuperClass().getSuperClass() != null && include_class.getSuperClass().getSuperClass() instanceof IncludedModuleWrapper) {
+						remove_nested_module(klass.getSuperClass().getSuperClass(), include_class.getSuperClass());
+  			}
+      
+ 				setSuperClass(klass, klass.getSuperClass().getSuperClass());
 
-        return recv;
-    }
+		}		    
 
 		protected synchronized static void setSuperClass(RubyModule klass, RubyModule superClass)
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
