@@ -17,7 +17,7 @@ static VALUE rb_unmix(VALUE self, VALUE module) {
    VALUE super = RCLASS(klass)->super;
    if (BUILTIN_TYPE(super) == T_ICLASS) {
   		if (RBASIC(super)->klass == module) {
-			  if(RCLASS(module)->super && BUILTIN_TYPE(RCLASS(module)->super) == T_ICLASS) 
+			  if(RCLASS(module)->super && BUILTIN_TYPE(RCLASS(module)->super) == T_ICLASS)
 					remove_nested_module(super, module);
        	RCLASS(klass)->super = RCLASS(RCLASS(klass)->super)->super;
        	rb_clear_cache();
@@ -55,12 +55,15 @@ static void add_module(VALUE self, VALUE module) {
 }
 
 static VALUE rb_mixin(VALUE self, VALUE module) {
+	VALUE nested_modules;
+	VALUE nested_module;
+	int index;
 	rb_unmix(self, module);
 
-  VALUE nested_modules = rb_mod_included_modules(module);
-  int index;
+  nested_modules = rb_mod_included_modules(module);
+  //VALUE nested_modules = rb_mod_included_modules(module);
   for (index = RARRAY(nested_modules)->len; index > 0; index--) {
-    VALUE nested_module = RARRAY(nested_modules)->ptr[index-1];
+     nested_module = RARRAY(nested_modules)->ptr[index-1];
       add_module(self, nested_module);
   }
 
