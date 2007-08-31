@@ -3,18 +3,19 @@ require 'rake/clean'
 require 'rake/gempackagetask'
 require "rake/testtask"
 
-if RUBY_PLATFORM =~ /java/
-  task :default => %w[clean compile_java test]
-else
-  task :default => %w[clean compile test]
-end
+desc "clean, compile, test"
+task :default => %w[clean compile test]
 
 Rake::TestTask.new("test") do |t|
   t.pattern = "test/**/*_test.rb"
 end
 
 desc "Builds the extension"
-task :compile => ["ext/mixology/Makefile", "ext/mixology/mixology.#{Config::CONFIG['DLEXT']}" ]
+if RUBY_PLATFORM =~ /java/
+  task :compile => :compile_java
+else
+  task :compile => %W[ext/mixology/Makefile ext/mixology/mixology.#{Config::CONFIG['DLEXT']}]
+end
 
 file "ext/mixology/Makefile" => ["ext/mixology/extconf.rb"] do
   Dir.chdir("ext/mixology") do
@@ -48,6 +49,9 @@ specification = Gem::Specification.new do |s|
   if RUBY_PLATFORM =~ /mswin/
     s.platform = Gem::Platform::WIN32
     s.files += ["lib/mixology.so"]
+  elsif RUBY_PLATFORM =~ /java/
+    s.platform = "jruby"
+    s.files += ["lib/mixology.jar"]
   else
     s.platform = Gem::Platform::RUBY
     s.extensions = FileList["ext/**/extconf.rb"].to_a
