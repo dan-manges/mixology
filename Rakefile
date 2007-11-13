@@ -50,7 +50,7 @@ specification = Gem::Specification.new do |s|
     s.platform = Gem::Platform::WIN32
     s.files += ["lib/mixology.so"]
   elsif RUBY_PLATFORM =~ /java/
-    s.platform = "jruby"
+    s.platform = "java"
     s.files += ["lib/mixology.jar"]
   else
     s.platform = Gem::Platform::RUBY
