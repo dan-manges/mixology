@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,9 +9,9 @@ import org.jruby.Ruby;
 import org.jruby.RubyArray;
 import org.jruby.RubyClass;
 import org.jruby.RubyModule;
+import org.jruby.anno.JRubyMethod;
 import org.jruby.IncludedModuleWrapper;
 import org.jruby.runtime.Block;
-import org.jruby.runtime.CallbackFactory;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.load.BasicLibraryService;
@@ -20,16 +19,16 @@ import org.jruby.runtime.load.BasicLibraryService;
 public class MixologyService implements BasicLibraryService {
     public boolean basicLoad(final Ruby runtime) throws IOException {
         RubyModule mixologyModule = runtime.defineModule("Mixology");
-        CallbackFactory callbackFactory = runtime.callbackFactory(MixologyService.class);
-        mixologyModule.definePublicModuleFunction("mixin", callbackFactory.getSingletonMethod("mixin", RubyModule.class));
-        mixologyModule.definePublicModuleFunction("unmix", callbackFactory.getSingletonMethod("unmix", RubyModule.class));
-	    	runtime.getObject().includeModule(mixologyModule);
+        mixologyModule.defineAnnotatedMethods(MixologyService.class);
+	    runtime.getObject().includeModule(mixologyModule);
         return true;
     }
     
 
-    public synchronized static IRubyObject unmix(IRubyObject recv, RubyModule module, Block block) 
+    @JRubyMethod(name = "unmix", required = 1)
+    public synchronized static IRubyObject unmix(IRubyObject recv, IRubyObject _module, Block block) 
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+		RubyModule module = (RubyModule)_module;
         for (RubyModule klass = recv.getMetaClass(); klass != recv.getMetaClass().getRealClass(); klass = klass.getSuperClass()) {
             if (klass.getSuperClass() != null &&  klass.getSuperClass().getNonIncludedClass() == module) {
 						  if(module.getSuperClass() != null && module.getSuperClass() instanceof IncludedModuleWrapper) 
@@ -43,8 +42,10 @@ public class MixologyService implements BasicLibraryService {
 
     }
 
-		public synchronized static IRubyObject mixin(IRubyObject recv, RubyModule module, Block block) 
+        @JRubyMethod(name = "mixin", required = 1)
+		public synchronized static IRubyObject mixin(IRubyObject recv, IRubyObject _module, Block block) 
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+		RubyModule module = (RubyModule)_module;
       	unmix(recv, module, block);
 
 			RubyClass klass = recv.getSingletonClass();
@@ -108,11 +109,11 @@ public class MixologyService implements BasicLibraryService {
 		}
 
 		protected static void clearCache(RubyModule klass, RubyModule module) {
-			List methodNames = new ArrayList(module.getMethods().keySet());
+			List<String> methodNames = new ArrayList<String>(module.getMethods().keySet());
       for (Iterator iter = methodNames.iterator();
       	iter.hasNext();) {
         String methodName = (String) iter.next();
-        klass.getRuntime().getCacheMap().remove(methodName, klass.searchMethod(methodName));
+        klass.getRuntime().getCacheMap().remove(klass.searchMethod(methodName));
       }
 		}
 }

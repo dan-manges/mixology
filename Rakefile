@@ -65,7 +65,7 @@ end
 desc "Compiles the JRuby extension"
 task :compile_java do
   Dir.chdir("ext/mixology") do
-    sh %{javac -source 1.4 -target 1.4 -classpath $JRUBY_HOME/lib/jruby.jar MixologyService.java}
+    sh %{javac -source 1.5 -target 1.5 -classpath $JRUBY_HOME/lib/jruby.jar MixologyService.java}
     sh %{jar cf mixology.jar MixologyService.class}
     cp "mixology.jar", "../../lib/mixology.jar"
   end

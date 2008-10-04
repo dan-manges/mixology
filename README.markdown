@@ -24,6 +24,12 @@ usage
     
 that's pretty much it. for other examples, take a look at the tests.
 
+compatible ruby implementations
+------------------------------
+
+* MRI 1.8.x
+* JRuby 1.1.x
+
 collaborators
 -------------
 
