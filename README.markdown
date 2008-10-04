@@ -24,8 +24,8 @@ usage
     
 that's pretty much it. for other examples, take a look at the tests.
 
-compatible ruby implementations
-------------------------------
+implementations
+---------------
 
 * MRI 1.8.x
 * JRuby 1.1.x
