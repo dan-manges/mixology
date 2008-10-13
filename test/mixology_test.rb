@@ -44,9 +44,6 @@ class MixologyTest < Test::Unit::TestCase
   end
   
   def test_unmix_effects_limited_to_instance
-    if rubinius?
-      print "PENDING"; return
-    end
     mixin = Module.new { def foo; "mixin"; end }
     object = Class.new {include mixin}.new
     assert_equal "mixin", object.foo
@@ -79,9 +76,6 @@ class MixologyTest < Test::Unit::TestCase
   end
   
   def test_included_modules_after_remix
-    if rubinius?
-      print "PENDING"; return
-    end
     mixin_one = Module.new
     mixin_two = Module.new
     object = Object.new
@@ -129,7 +123,7 @@ class MixologyTest < Test::Unit::TestCase
     assert_equal [mixin, nested_module, nested_module_penultimate, nested_module_ultimate, Mixology, Kernel], (class << object; self; end).included_modules
   end
    
-  def test_nested_modules_are_mixedin_even_if_alrady_mixed_in
+  def test_nested_modules_are_mixedin_even_if_already_mixed_in
     if rubinius?
       print "PENDING"; return
     end

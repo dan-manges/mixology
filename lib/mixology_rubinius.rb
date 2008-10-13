@@ -1,5 +1,6 @@
 module Mixology
   def mixin(mod)
+    unmix mod
     reset_method_cache
     IncludedModule.new(mod).attach_to metaclass
     reset_method_cache
@@ -10,6 +11,7 @@ module Mixology
     last_super = metaclass
     this_super = metaclass.direct_superclass
     while this_super
+      break if this_super == self.class
       if (this_super == mod_to_unmix ||
           this_super.respond_to?(:module) && this_super.module == mod_to_unmix)
         reset_method_cache
