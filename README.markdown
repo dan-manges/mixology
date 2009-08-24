@@ -27,7 +27,7 @@ that's pretty much it. for other examples, take a look at the tests.
 implementations
 ---------------
 
-* MRI 1.8.x
+* MRI 1.8.x, 1.9.x
 * JRuby 1.1.x
 
 collaborators
@@ -37,6 +37,8 @@ collaborators
 * anonymous z
 * [Dan Manges](http://www.dcmanges.com/blog)
 * Clint Bishop
+* [Banister Fiend](http://banisterfiend.wordpress.com/)
+* [Tianyi Cui](http://cuitianyi.com/)
 
 source
 ------

@@ -30,10 +30,8 @@ file "ext/mixology/mixology.#{Config::CONFIG['DLEXT']}" do
   cp "ext/mixology/mixology.#{Config::CONFIG['DLEXT']}", "lib"
 end
 
-CLEAN.include %w[ext/mixology/Makefile ext/mixology/mixology.bundle lib/mixology.bundle]
+CLEAN.include %w[ext/mixology/Makefile ext/mixology/mixology.bundle ext/mixology/mixology.so lib/mixology.bundle lib/mixology.so ext/mixology/mixology.o]
 CLEAN.include %w[ext/mixology/MixableService.class ext/mixology/mixable.jar lib/mixology.jar]
-
-Gem::manage_gems
 
 specification = Gem::Specification.new do |s|
 	s.name   = "mixology"
