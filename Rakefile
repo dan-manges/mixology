@@ -36,7 +36,7 @@ CLEAN.include %w[ext/mixology/MixableService.class ext/mixology/mixable.jar lib/
 specification = Gem::Specification.new do |s|
 	s.name   = "mixology"
   s.summary = "Mixology enables objects to mixin and unmix modules."
-	s.version = "0.1.0"
+	s.version = "0.2.0"
 	s.author = "anonymous z, Pat Farley, Dan Manges"
 	s.description = s.summary
   s.homepage = "http://mixology.rubyforge.org"
@@ -86,7 +86,10 @@ task :test_multi do
     end
   end
   jruby.each do |jruby_version|
-    test_implementation.call "JRuby #{jruby_version}", "/usr/local/jruby-#{jruby_version}/bin/jruby -S rake"
+    test_implementation.call(
+      "JRuby #{jruby_version}",
+      "JRUBY_HOME=/usr/local/jruby-#{jruby_version} /usr/local/jruby-#{jruby_version}/bin/jruby -S rake"
+    )
   end
   mri.each do |mri_version|
     test_implementation.call "MRI #{mri_version}", "/usr/local/ruby-#{mri_version}/bin/rake"
