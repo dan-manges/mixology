@@ -17,6 +17,6 @@ Gem::Specification.new do |s|
     s.files += ["lib/mixology.jar"]
   else
     s.platform = Gem::Platform::RUBY
-    s.extensions = `git ls-files -- ext/**/*`.split("\n")
+    s.extensions = %w(ext/mixology/extconf.rb)
   end
 end
