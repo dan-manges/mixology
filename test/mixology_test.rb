@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + "/test_helper"
+require File.expand_path(File.dirname(__FILE__)) + "/test_helper"
 
 class MixologyTest < Test::Unit::TestCase
   
@@ -178,6 +178,21 @@ class MixologyTest < Test::Unit::TestCase
   
   def rubinius?
     defined?(RUBY_ENGINE) && RUBY_ENGINE == "rbx"
+  end
+
+  def test_mixed_in_hook
+    a = Module.new { def self.mixed_in(obj); obj.instance_variable_set(:@called, true) ;end }
+    o = Object.new
+    o.mixin a
+    assert_equal true, o.instance_variable_get(:@called)
+  end
+
+  def test_mixed_in_hook
+    a = Module.new { def self.unmixed(obj); obj.instance_variable_set(:@called, true) ;end }
+    o = Object.new
+    o.mixin a
+    o.unmix a
+    assert_equal true, o.instance_variable_get(:@called)
   end
 
 end
