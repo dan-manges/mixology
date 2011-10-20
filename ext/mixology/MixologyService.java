@@ -113,7 +113,7 @@ public class MixologyService implements BasicLibraryService {
       for (Iterator iter = methodNames.iterator();
       	iter.hasNext();) {
         String methodName = (String) iter.next();
-        klass.getRuntime().getCacheMap().remove(klass.searchMethod(methodName));
+        // klass.getRuntime().getCacheMap().remove(klass.searchMethod(methodName));
       }
 		}
 }
