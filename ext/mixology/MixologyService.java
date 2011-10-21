@@ -34,6 +34,7 @@ public class MixologyService implements BasicLibraryService {
 						  if(module.getSuperClass() != null && module.getSuperClass() instanceof IncludedModuleWrapper) 
 								remove_nested_module(klass.getSuperClass(), module);
 									setSuperClass(klass, klass.getSuperClass().getSuperClass());
+                  clearCacheMap(klass, module);
 						}
         }
 
@@ -66,6 +67,7 @@ public class MixologyService implements BasicLibraryService {
 		  }
 
 				add_module(klass, module);
+        clearCache(klass, klass.getSuperClass());
 
 				return recv;
 		}
@@ -78,6 +80,8 @@ public class MixologyService implements BasicLibraryService {
 				IncludedModuleWrapper includedKlass = new IncludedModuleWrapper(klass.getRuntime(), klass.getSuperClass(), module);
 				
         setSuperClass(klass, includedKlass);
+
+        clearCache(klass, klass.getSuperClass());
     }
 
 		protected synchronized static void remove_nested_module(RubyClass klass, RubyModule include_class) 
@@ -104,4 +108,11 @@ public class MixologyService implements BasicLibraryService {
 				method.invoke(klass, superClassArg);
 		}
 
+    protected static void clearCache(RubyModule klass, RubyModule module) {
+        List<String> methodNames = new ArrayList<String>(module.getMethods().keySet());
+        for (Iterator iter = methodNames.iterator(); iter.hasNext();) {
+            String methodName = (String) iter.next();
+            klass.getRuntime().getConstantCacheMap().remove(klass.searchMethod(methodName));
+        }
+    }
 }
