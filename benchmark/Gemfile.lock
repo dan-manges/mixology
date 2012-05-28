@@ -1,0 +1,18 @@
+GIT
+  remote: git://github.com/bearded/perftools.rb.git
+  revision: df73f93e4dda8953e77ba3be2945f4bf806b07cf
+  branch: perftools-1.8
+  specs:
+    perftools.rb (0.5.6)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    mixology (0.2.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  mixology
+  perftools.rb!
