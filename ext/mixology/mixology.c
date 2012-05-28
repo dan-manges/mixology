@@ -53,6 +53,11 @@ static VALUE rb_unmix(VALUE self, VALUE module)
 
                 RCLASS_SUPER(klass) = RCLASS_SUPER(RCLASS_SUPER(klass));
                 rb_clear_cache();
+
+                /* If the module is taken out, call the unmixed(obj) hook on
+                 * the module */
+                rb_funcall(module, rb_intern("unmixed"), 1, self);
+
             }
         }
     }
@@ -112,7 +117,24 @@ static VALUE rb_mixin(VALUE self, VALUE module)
     add_module(self, module);
 
     rb_clear_cache();
+
+    /* If the module is added, call the mixed_in(obj) hook on
+     * the added module */
+    rb_funcall(module, rb_intern("mixed_in"), 1, self);
+
     return self;
+}
+
+/* Using this hook, it's possible to do things when a module
+ * gets mixed in */
+static VALUE rb_mixed_in(VALUE self, VALUE obj)
+{
+    /* Do nothing here. */
+}
+
+static VALUE rb_unmixed(VALUE self, VALUE obj)
+{
+    /* Do nothing here. */
 }
 
 void Init_mixology()
@@ -121,5 +143,10 @@ void Init_mixology()
 
     rb_define_method(Mixology, "mixin", rb_mixin, 1);
     rb_define_method(Mixology, "unmix", rb_unmix, 1);
+
+    /* Adding a hook to Module */
+    rb_define_method(rb_const_get(rb_cObject, rb_intern("Module")), "mixed_in", rb_mixed_in, 1);
+    rb_define_method(rb_const_get(rb_cObject, rb_intern("Module")), "unmixed", rb_unmixed, 1);
+
     rb_include_module(rb_cObject, Mixology);
 }
